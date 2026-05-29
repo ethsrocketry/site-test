@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{{ page.title | default: site.title }}</title>
+  <link rel="icon" type="image/png" href="{{ '/etrb-logo.png' | relative_url }}">
+  <link rel="apple-touch-icon" href="{{ '/etrb-logo.png' | relative_url }}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    (() => {
+      const THEME_KEY = 'etrb_theme';
+      const savedTheme = localStorage.getItem(THEME_KEY);
+      const prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
+      const theme = savedTheme || (prefersLight ? 'light' : 'dark');
+      document.documentElement.setAttribute('data-theme', theme);
+    })();
+  </script>
+  <link rel="stylesheet" href="{{ '/assets/css/site.css' | relative_url }}">
+  <link rel="stylesheet" href="{{ '/assets/css/pages/' | append: page.nav | append: '.css' | relative_url }}">
+</head>
+<body class="{{ page.body_class }}">
+  <nav>
+    <a class="nav-logo" href="{{ '/home.html' | relative_url }}">
+      <img src="{{ '/etrb-logo.png' | relative_url }}" alt="ETHS Rocketry logo" />
+      <span class="nav-brand">ETHS Rocketry</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="{{ '/home.html' | relative_url }}"{% if page.nav == 'home' %} class="active"{% endif %}>home</a></li>
+      <li><a href="{{ '/arc-2026.html' | relative_url }}"{% if page.nav == 'arc-2026' %} class="active"{% endif %}>arc 2026</a></li>
+      <li><a href="{{ '/r4s.html' | relative_url }}"{% if page.nav == 'r4s' %} class="active"{% endif %}>r4s</a></li>
+      <li><a href="{{ '/history.html' | relative_url }}"{% if page.nav == 'history' %} class="active"{% endif %}>history</a></li>
+      <li><a href="{{ '/people.html' | relative_url }}"{% if page.nav == 'people' %} class="active"{% endif %}>people</a></li>
+      <li><a href="{{ '/releases.html' | relative_url }}"{% if page.nav == 'releases' %} class="active"{% endif %}>releases</a></li>
+      <li><a href="{{ '/join-us.html' | relative_url }}" class="join-us-link{% if page.nav == 'join-us' %} active{% endif %}">join us</a></li>
+      <li>
+        <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Toggle light and dark theme" aria-pressed="false">
+          <span class="theme-toggle-icon" aria-hidden="true">🌙</span>
+          <span class="theme-toggle-label">dark</span>
+        </button>
+      </li>
+      <li class="member-pill" id="member-pages-pill">
+        <a href="{{ '/member-tools.html' | relative_url }}" class="member-entry{% if page.nav == 'member-tools' %} active{% endif %}">
+          <span>member tools</span>
+          <span class="lock-icon" id="member-lock-icon"><svg viewBox="0 0 20 20" fill="none"><rect x="4" y="9" width="12" height="9" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M7 9V6.8a3 3 0 1 1 6 0V9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></span>
+        </a>
+        <span class="member-pill-sep member-only"></span>
+        <a href="{{ '/info-base.html' | relative_url }}" class="member-only{% if page.nav == 'info-base' %} active{% endif %}">info base</a>
+        <span class="member-pill-sep member-only"></span>
+        <a href="{{ '/arc-org.html' | relative_url }}" class="member-only{% if page.nav == 'arc-org' %} active{% endif %}">arc org</a>
+        <span class="member-pill-sep member-only"></span>
+        <a href="{{ '/r4s-org.html' | relative_url }}" class="member-only{% if page.nav == 'r4s-org' %} active{% endif %}">r4s org</a>
+      </li>
+    </ul>
+  </nav>
+
+  {{ content }}
+
+  <script>
+    const SESSION_KEY = 'etrb_auth';
+
+    function setMemberNavState(isLoggedIn) {
+      const icon = document.getElementById('member-lock-icon');
+      if (icon) icon.classList.toggle('unlocked', isLoggedIn);
+      document.querySelectorAll('.member-only').forEach(el => {
+        el.style.display = isLoggedIn ? 'inline-flex' : 'none';
+      });
+    }
+
+    setMemberNavState(sessionStorage.getItem(SESSION_KEY) === '1');
+  </script>
+
+  <script>
+    (() => {
+      const THEME_KEY = 'etrb_theme';
+      const toggleBtn = document.getElementById('theme-toggle');
+      if (!toggleBtn) return;
+      const icon = toggleBtn.querySelector('.theme-toggle-icon');
+      const label = toggleBtn.querySelector('.theme-toggle-label');
+
+      function applyTheme(theme) {
+        document.documentElement.setAttribute('data-theme', theme);
+        toggleBtn.setAttribute('aria-pressed', theme === 'light' ? 'true' : 'false');
+        if (icon) icon.textContent = theme === 'light' ? '☀️' : '🌙';
+        if (label) label.textContent = theme;
+      }
+
+      const savedTheme = localStorage.getItem(THEME_KEY);
+      const prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
+      applyTheme(savedTheme || (prefersLight ? 'light' : 'dark'));
+
+      toggleBtn.addEventListener('click', () => {
+        const nextTheme = document.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+        localStorage.setItem(THEME_KEY, nextTheme);
+        applyTheme(nextTheme);
+      });
+    })();
+  </script>
+</body>
+</html>
